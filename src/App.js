@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect} from 'react';
+import './App.scss';
+import Header from './components/header/header'
+import Login from './containers/auth/login'
+import {BrowserRouter} from "react-router-dom";
+import {connect} from "react-redux";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = (props) => {
 
-export default App;
+    useEffect(() => {
+        console.log('APP', props);
+    });
+
+    return (
+        <BrowserRouter>
+            <div className="App">
+                {props.authenticated ? <Header/> : null}
+                {!props.authenticated ? <Login/> : null}
+            </div>
+        </BrowserRouter>
+    );
+};
+
+const mapStateToProps = (state) => {
+    return {
+        authenticated: state.authReducer.authenticated
+    };
+};
+
+export default connect(mapStateToProps, null)(App);

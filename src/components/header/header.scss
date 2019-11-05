@@ -1,0 +1,18 @@
+.Header {
+  .toolbar {
+    display: flex;
+    flex: 1 1 100%;
+    justify-content: space-between;
+
+    .navigations {
+      a {
+        cursor: pointer;
+        text-decoration: none;
+        color: #ffffff;
+      }
+      a.active {
+        color: #000;
+      }
+    }
+  }
+}
