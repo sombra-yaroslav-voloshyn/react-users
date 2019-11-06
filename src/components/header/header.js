@@ -9,9 +9,23 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import TypoGraphy from '@material-ui/core/Typography'
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import * as authActions from "../../store/actions/authActions";
+import {connect} from "react-redux";
 
 
-const header = () => {
+const Header = (props) => {
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    const openMenu = event => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuOption = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <div className='Header'>
             <AppBar position="static">
@@ -46,9 +60,24 @@ const header = () => {
                         </List>
                     </div>
                     <div>
-                        <IconButton edge="start" color="inherit" aria-label="menu">
+                        <IconButton aria-controls="user-menu"
+                                    edge="start"
+                                    color="inherit"
+                                    aria-label="menu"
+                                    onClick={openMenu}
+                        >
                             <PersonIcon/>
                         </IconButton>
+                        <Menu
+                            id="user-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleMenuOption}
+                        >
+                            <MenuItem onClick={handleMenuOption}>Profile</MenuItem>
+                            <MenuItem onClick={() => {setAnchorEl(null);props.logout()}}>Logout</MenuItem>
+                        </Menu>
                     </div>
                 </Toolbar>
             </AppBar>
@@ -56,4 +85,10 @@ const header = () => {
     );
 };
 
-export default header;
+const mapDispatchToProps = dispatch => {
+    return {
+        logout: () => dispatch(authActions.logout()),
+    };
+};
+
+export default connect(null, mapDispatchToProps)(Header);

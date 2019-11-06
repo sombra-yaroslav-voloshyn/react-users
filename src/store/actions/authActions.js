@@ -20,3 +20,16 @@ export const setAuthenticated  = (result) => {
         dispatch(saveResult(result))
     };
 };
+const setLogout = () => {
+    localStorage.clear();
+    return {
+        type: AUTHENTICATED,
+        authenticated: false
+    }
+};
+
+export const logout = () => {
+    return dispatch => {
+        dispatch(setLogout())
+    }
+};
