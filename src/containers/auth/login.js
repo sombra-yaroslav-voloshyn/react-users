@@ -31,7 +31,7 @@ const Login = (props) => {
         if (token) {
             props.history.push('/home');
         }
-    }, [props, token]);
+    }, [token, props]);
 
     const handleLogin = () => {
         const req = {

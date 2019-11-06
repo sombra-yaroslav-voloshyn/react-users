@@ -3,8 +3,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {getUsers, getUsersFail} from "../../store/actions/usersActions";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import UsersTable from "./usersTable/usersTable";
 
-const Users = (props) => {
+const Users = () => {
     const dispatch = useDispatch();
 
     const {token, error} = useSelector((state) => ({
@@ -23,7 +24,7 @@ const Users = (props) => {
     if (!users) {
         usersBlock = <CircularProgress size={100}/>
     } else {
-        usersBlock = <h1>Users!</h1>
+        usersBlock = <UsersTable users={users}/>
     }
 
     return (

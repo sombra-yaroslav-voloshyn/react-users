@@ -8,6 +8,7 @@ import {Redirect, Route, Switch} from "react-router";
 import Home from "./containers/home/home";
 import Users from "./containers/users/users";
 import {checkAuthState} from "./store/actions/authActions";
+import PrivateRoute from "./components/privateRoute/privateRoute";
 
 const App = (props) => {
     const dispatch = useDispatch();
@@ -18,32 +19,18 @@ const App = (props) => {
 
     useEffect(() => {
         dispatch(checkAuthState());
-    }, []);
-
-    let routes = (
-        <Switch>
-            <Route path="/login" component={Login}/>
-            <Redirect from="/" to="/login"/>
-        </Switch>
-    );
-
-    if (token) {
-        routes = (
-            <div>
-                <Header/>
-                <Switch>
-                    <Route path="/users" component={Users}/>
-                    <Route path="/home" component={Home}/>
-                    <Redirect to="/home"/>
-                </Switch>
-            </div>
-        );
-    }
+    }, [props, dispatch]);
 
     return (
         <BrowserRouter>
             <div className="App">
-                {routes}
+                {token ? <Header/> : null}
+                <Switch>
+                    <Route path="/login" component={Login}/>
+                    <PrivateRoute path="/home" component={Home}/>
+                    <PrivateRoute path="/users" component={Users}/>
+                    <Redirect from="/" to="/login"/>
+                </Switch>
             </div>
         </BrowserRouter>
     );

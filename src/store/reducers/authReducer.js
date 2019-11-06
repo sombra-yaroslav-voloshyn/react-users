@@ -1,7 +1,7 @@
 import * as authActions from './../actions/authActions';
 
 const initialState = {
-    token: null,
+    token: localStorage.getItem('token') ? localStorage.getItem('token') : null,
     userId: null,
     error: null,
     loading: false

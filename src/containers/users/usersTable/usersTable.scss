@@ -1,0 +1,18 @@
+.UsersTable {
+  margin: 1rem;
+
+  .title {
+    margin-bottom: 1rem;
+  }
+
+  .tableWrapper {
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+  }
+
+  .tablePagination {
+    display: flex;
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+}
