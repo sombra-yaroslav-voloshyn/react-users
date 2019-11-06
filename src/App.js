@@ -1,29 +1,52 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.scss';
 import Header from './components/header/header'
 import Login from './containers/auth/login'
 import {BrowserRouter} from "react-router-dom";
-import {connect} from "react-redux";
-import {Redirect, Route} from "react-router";
+import {useDispatch, useSelector} from "react-redux";
+import {Redirect, Route, Switch} from "react-router";
 import Home from "./containers/home/home";
+import Users from "./containers/users/users";
+import {checkAuthState} from "./store/actions/authActions";
 
 const App = (props) => {
+    const dispatch = useDispatch();
+
+    const {token} = useSelector((state) => ({
+        ...state.authReducer
+    }));
+
+    useEffect(() => {
+        dispatch(checkAuthState());
+    }, []);
+
+    let routes = (
+        <Switch>
+            <Route path="/login" component={Login}/>
+            <Redirect from="/" to="/login"/>
+        </Switch>
+    );
+
+    if (token) {
+        routes = (
+            <div>
+                <Header/>
+                <Switch>
+                    <Route path="/users" component={Users}/>
+                    <Route path="/home" component={Home}/>
+                    <Redirect to="/home"/>
+                </Switch>
+            </div>
+        );
+    }
+
     return (
         <BrowserRouter>
             <div className="App">
-                {props.authenticated ? <Header/> : null}
-                {!props.authenticated ? <Redirect exact from="/" to="/login"/> : null}
-                <Route path="/home" component={Home}/>
-                <Route path="/login" component={Login}/>
+                {routes}
             </div>
         </BrowserRouter>
     );
 };
 
-const mapStateToProps = (state) => {
-    return {
-        authenticated: state.authReducer.authenticated
-    };
-};
-
-export default connect(mapStateToProps, null)(App);
+export default App;

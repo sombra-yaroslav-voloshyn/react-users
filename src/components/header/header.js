@@ -11,11 +11,12 @@ import ListItemText from "@material-ui/core/ListItemText";
 import TypoGraphy from '@material-ui/core/Typography'
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import * as authActions from "../../store/actions/authActions";
-import {connect} from "react-redux";
+import {useDispatch} from "react-redux";
+import {logout} from "../../store/actions/authActions";
 
 
-const Header = (props) => {
+const Header = () => {
+    const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const openMenu = event => {
@@ -76,7 +77,7 @@ const Header = (props) => {
                             onClose={handleMenuOption}
                         >
                             <MenuItem onClick={handleMenuOption}>Profile</MenuItem>
-                            <MenuItem onClick={() => {setAnchorEl(null);props.logout()}}>Logout</MenuItem>
+                            <MenuItem onClick={() => {setAnchorEl(null);dispatch(logout())}}>Logout</MenuItem>
                         </Menu>
                     </div>
                 </Toolbar>
@@ -85,10 +86,4 @@ const Header = (props) => {
     );
 };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        logout: () => dispatch(authActions.logout()),
-    };
-};
-
-export default connect(null, mapDispatchToProps)(Header);
+export default Header;

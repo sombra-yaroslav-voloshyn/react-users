@@ -7,9 +7,11 @@ import {Provider} from 'react-redux';
 import {applyMiddleware, combineReducers, createStore} from "redux";
 import authReducer from "./store/reducers/authReducer";
 import thunk from "redux-thunk";
+import {usersReducer} from "./store/reducers/usersReducer";
 
 const rootReducer = combineReducers({
-    authReducer
+    authReducer,
+    usersReducer
 });
 
 const logger = store => {
