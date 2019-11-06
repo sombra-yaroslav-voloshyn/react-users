@@ -15,13 +15,25 @@ const Login = (props) => {
     });
 
     useEffect(() => {
-        console.log('LOGIN', props);
-    });
+        console.log('LOGIN useEffect', props);
+        if (props.authenticated) {
+            props.history.push('/home');
+        }
+    }, [props, props.authenticated]);
+
+    const handleLogin = () => {
+        const req = {
+            email: loginState.email,
+            password: loginState.password
+        };
+
+        props.onAuth(req);
+    };
 
     return (
         <div className="Login">
             <Container component="main" maxWidth="xs">
-                <CssBaseline />
+                <CssBaseline/>
                 <div className={null}>
                     <Typography component="h1" variant="h5">
                         Sign in
@@ -60,7 +72,7 @@ const Login = (props) => {
                             variant="contained"
                             color="primary"
                             disabled={!loginState.password || !loginState.email}
-                            onClick={() => props.onAuth()}
+                            onClick={handleLogin}
                         >
                             Sign In
                         </Button>
@@ -68,6 +80,7 @@ const Login = (props) => {
                 </div>
             </Container>
         </div>
+
     );
 };
 
@@ -79,7 +92,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: () => dispatch(authActions.setAuthenticated(true)),
+        onAuth: (req) => dispatch(authActions.setAuthenticated(req)),
     };
 };
 

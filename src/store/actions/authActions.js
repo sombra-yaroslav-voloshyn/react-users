@@ -1,10 +1,17 @@
 export const AUTHENTICATED = 'AUTHENTICATED';
 
 const saveResult = (result) => {
-    localStorage.setItem('authenticated', result);
-    return {
-        type: AUTHENTICATED,
-        authenticated: result
+    if (result.email === 'a' && result.password === 'a') {
+        localStorage.setItem('authenticated', true.toString());
+        return {
+            type: AUTHENTICATED,
+            authenticated: true
+        }
+    } else {
+        return {
+            type: AUTHENTICATED,
+            authenticated: false,
+        }
     }
 };
 

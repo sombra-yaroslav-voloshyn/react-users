@@ -1,21 +1,20 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import './App.scss';
 import Header from './components/header/header'
 import Login from './containers/auth/login'
 import {BrowserRouter} from "react-router-dom";
 import {connect} from "react-redux";
+import {Redirect, Route} from "react-router";
+import Home from "./containers/home/home";
 
 const App = (props) => {
-
-    useEffect(() => {
-        console.log('APP', props);
-    });
-
     return (
         <BrowserRouter>
             <div className="App">
                 {props.authenticated ? <Header/> : null}
-                {!props.authenticated ? <Login/> : null}
+                {!props.authenticated ? <Redirect exact from="/" to="/login"/> : null}
+                <Route path="/home" component={Home}/>
+                <Route path="/login" component={Login}/>
             </div>
         </BrowserRouter>
     );
