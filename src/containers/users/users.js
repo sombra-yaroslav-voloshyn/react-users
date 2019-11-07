@@ -7,7 +7,6 @@ import UsersTable from "./usersTable/usersTable";
 
 const Users = () => {
     const dispatch = useDispatch();
-
     const {token, error} = useSelector((state) => ({
         ...state.authReducer
     }));
@@ -20,11 +19,23 @@ const Users = () => {
         dispatch(getUsers(token));
     }, []);
 
+    const updateUser = (updatedUser) => {
+        console.log('[Users] updatedUser: ', updatedUser);
+
+        // TODO fix update all
+        // let updatedUsers = [...users];
+        // const userIndex = updatedUsers.findIndex(user => user.id === updatedUser.id);
+        // updatedUsers[userIndex] = updatedUser;
+        // dispatch(getUsersSuccess(updatedUsers));
+    };
+
     let usersBlock;
     if (!users) {
         usersBlock = <CircularProgress size={100}/>
     } else {
-        usersBlock = <UsersTable users={users}/>
+        usersBlock = <UsersTable users={users}
+                                 handleUpdatedUser={(user) => updateUser(user)}
+        />
     }
 
     return (

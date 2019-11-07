@@ -1,77 +1,94 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Paper from "@material-ui/core/Paper";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableFooter from "@material-ui/core/TableFooter";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableHead from "@material-ui/core/TableHead";
-import Typography from "@material-ui/core/Typography";
 import './usersTable.scss';
+import MaterialTable from 'material-table'
+import {useDispatch, useSelector} from "react-redux";
+import {postUser, putUser, requestUserFail} from "../../../store/actions/userActions";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@material-ui/core/Snackbar";
 
 const UsersTable = (props) => {
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.users - page * rowsPerPage);
+    const dispatch = useDispatch();
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
+    const {token} = useSelector((state) => ({
+        ...state.authReducer
+    }));
+
+    const {user, loading, error} = useSelector((state) => ({
+        ...state.userReducer
+    }));
+
+    useEffect(() => {
+        if (user.firstName) {
+            props.handleUpdatedUser(user);
+        }
+    }, [props, user]);
+
+    const editUser = (event = null, rowData) => {
+        const userIndex = props.users.findIndex(user => user.id === rowData.id);
+        const user = {...props.users[userIndex]};
+        user.firstName = 'Ivan';
+        dispatch(putUser(token, userIndex, user))
     };
 
-    const handleChangeRowsPerPage = event => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+    const addUser = () => {
+        const user = {
+            deleted: false,
+            firstName: `First Name${Math.floor(Math.random() * 100)}`,
+            id: Math.floor(Math.random() * 999999),
+            lastName: `Last Name Name${Math.floor(Math.random() * 100)}`,
+
+        };
+        dispatch(postUser(token, user));
     };
+
+    let table;
+    if (loading) {
+        table = <CircularProgress size={100}/>
+    } else {
+        table = <MaterialTable
+            title="Manage Users"
+            columns={[
+                {title: 'Id', field: 'id'},
+                {title: 'First Name', field: 'firstName'},
+                {title: 'Last Name', field: 'lastName'},
+            ]}
+            data={props.users}
+            actions={[
+                {
+                    icon: 'delete',
+                    tooltip: 'Delete User',
+                    onClick: (event, rowData) => alert("You want to delete " + rowData.name)
+                },
+                {
+                    icon: 'edit',
+                    tooltip: 'Edit User',
+                    onClick: (event, rowData) => editUser(null, rowData)
+                },
+                {
+                    icon: 'add',
+                    tooltip: 'Add User',
+                    isFreeAction: true,
+                    onClick: (event) => addUser()
+                }
+            ]}
+            options={{
+                actionsColumnIndex: -1,
+                sorting: true
+            }}
+        />
+    }
 
     return (
         <div className="UsersTable">
-            <Typography className="title" variant="h5" component="h3">
-                Manage Users
-            </Typography>
             <Paper>
-                <div className="tableWrapper">
-                    <Table stickyHeader>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Id</TableCell>
-                                <TableCell>First Name</TableCell>
-                                <TableCell>Last Name</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {props.users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => (
-                                <TableRow key={row.id}>
-                                    <TableCell>{row.id}</TableCell>
-                                    <TableCell>{row.firstName}</TableCell>
-                                    <TableCell>{row.lastName}</TableCell>
-                                </TableRow>
-                            ))}
-
-                            {emptyRows > 0 && (
-                                <TableRow style={{ height: 53 * emptyRows }}>
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-                <div className="tablePagination">
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                        colSpan={3}
-                        count={props.users.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        SelectProps={{
-                            inputProps: { 'aria-label': 'rows per page' },
-                            native: true,
-                        }}
-                        onChangePage={handleChangePage}
-                        onChangeRowsPerPage={handleChangeRowsPerPage}
-                    />
-                </div>
+                {table}
             </Paper>
+            <Snackbar open={!!error}
+                      autoHideDuration={2000}
+                      anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+                      onClose={() => dispatch(requestUserFail(''))}
+                      message={error}/>
         </div>
     );
 };

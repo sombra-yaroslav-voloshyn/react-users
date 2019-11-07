@@ -29,7 +29,7 @@ export const getUsers = (token) => {
         dispatch(getUsersStart());
         axios.get('/users.json?auth=' + token)
             .then(res => {
-                dispatch(getUsersSuccess(res.data));
+                dispatch(getUsersSuccess(Object.values(res.data)));
             })
             .catch(err => {
                 console.log(err);
