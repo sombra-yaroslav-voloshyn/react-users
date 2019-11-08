@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import {useDispatch, useSelector} from "react-redux";
-import {getUsers, getUsersFail} from "../../store/actions/usersActions";
+import {getUsers, getUsersFail, getUsersSuccess} from "../../store/actions/usersActions";
 import Snackbar from "@material-ui/core/Snackbar";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import UsersTable from "./usersTable/usersTable";
@@ -15,26 +15,25 @@ const Users = () => {
         ...state.usersReducer
     }));
 
+    const {isNeedToUpdate} = useSelector((state) => ({
+        ...state.userReducer
+    }));
+
     useEffect(() => {
-        dispatch(getUsers(token));
-    }, []);
+        if (isNeedToUpdate) {
+            dispatch(getUsers(token));
+        }
 
-    const updateUser = (updatedUser) => {
-        console.log('[Users] updatedUser: ', updatedUser);
-
-        // TODO fix update all
-        // let updatedUsers = [...users];
-        // const userIndex = updatedUsers.findIndex(user => user.id === updatedUser.id);
-        // updatedUsers[userIndex] = updatedUser;
-        // dispatch(getUsersSuccess(updatedUsers));
-    };
+        return () => {
+            dispatch(getUsersSuccess(null))
+        }
+    }, [isNeedToUpdate]);
 
     let usersBlock;
     if (!users) {
         usersBlock = <CircularProgress size={100}/>
     } else {
         usersBlock = <UsersTable users={users}
-                                 handleUpdatedUser={(user) => updateUser(user)}
         />
     }
 

@@ -1,45 +1,73 @@
-import React, {useEffect} from 'react';
+import React, {useState} from 'react';
 import Paper from "@material-ui/core/Paper";
 import './usersTable.scss';
 import MaterialTable from 'material-table'
 import {useDispatch, useSelector} from "react-redux";
-import {postUser, putUser, requestUserFail} from "../../../store/actions/userActions";
+import {deleteUser, postUser, putUser, requestUserFail} from "../../../store/actions/userActions";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
+import AddEditUserModal from "../addEditUserModal/addEditUserModal";
+import PropTypes from 'prop-types';
+import ConfirmModal from "../../../components/confirmModal/confirmModal";
 
 const UsersTable = (props) => {
     const dispatch = useDispatch();
+    const emptyUser = {
+        id: null,
+        email: '',
+        firstName: '',
+        lastName: '',
+        deleted: null,
+    };
+
+    const [openModal, setOpenModal] = useState(false);
+    const [openConfirmModal, setOpenConfirmModal] = useState(false);
+    const [currentUser, setCurrentUser] = useState(emptyUser);
+    const [isUpdate, setIsUpdate] = useState(true);
 
     const {token} = useSelector((state) => ({
         ...state.authReducer
     }));
 
-    const {user, loading, error} = useSelector((state) => ({
+    const {loading, error} = useSelector((state) => ({
         ...state.userReducer
     }));
 
-    useEffect(() => {
-        if (user.firstName) {
-            props.handleUpdatedUser(user);
-        }
-    }, [props, user]);
-
-    const editUser = (event = null, rowData) => {
-        const userIndex = props.users.findIndex(user => user.id === rowData.id);
-        const user = {...props.users[userIndex]};
-        user.firstName = 'Ivan';
-        dispatch(putUser(token, userIndex, user))
+    const editUserHandler = (event = null, rowData) => {
+        setCurrentUser(rowData);
+        setIsUpdate(true);
+        setOpenModal(true);
     };
 
-    const addUser = () => {
-        const user = {
-            deleted: false,
-            firstName: `First Name${Math.floor(Math.random() * 100)}`,
-            id: Math.floor(Math.random() * 999999),
-            lastName: `Last Name Name${Math.floor(Math.random() * 100)}`,
+    const addUserHandler = () => {
+        setCurrentUser(emptyUser);
+        setIsUpdate(false);
+        setOpenModal(true);
+    };
 
-        };
-        dispatch(postUser(token, user));
+    const deleteUserHandler = (deletedUser) => {
+        setCurrentUser(deletedUser);
+        setOpenConfirmModal(true);
+    };
+
+    const handleCloseModal = (userFromModal) => {
+        setOpenModal(false);
+        if (userFromModal) {
+            if (isUpdate) {
+                dispatch(putUser(token, userFromModal.key, userFromModal))
+            } else {
+                const newUser = {...userFromModal};
+                newUser.id = Math.floor(Math.random() * 999999);
+                dispatch(postUser(token, newUser));
+            }
+        }
+    };
+
+    const handleCloseConfirmModal = (isAccepted) => {
+        setOpenConfirmModal(false);
+        if (isAccepted) {
+            dispatch(deleteUser(token, currentUser.key));
+        }
     };
 
     let table;
@@ -50,6 +78,7 @@ const UsersTable = (props) => {
             title="Manage Users"
             columns={[
                 {title: 'Id', field: 'id'},
+                {title: 'Email', field: 'email'},
                 {title: 'First Name', field: 'firstName'},
                 {title: 'Last Name', field: 'lastName'},
             ]}
@@ -58,23 +87,24 @@ const UsersTable = (props) => {
                 {
                     icon: 'delete',
                     tooltip: 'Delete User',
-                    onClick: (event, rowData) => alert("You want to delete " + rowData.name)
+                    onClick: (event, rowData) => deleteUserHandler(rowData)
                 },
                 {
                     icon: 'edit',
                     tooltip: 'Edit User',
-                    onClick: (event, rowData) => editUser(null, rowData)
+                    onClick: (event, rowData) => editUserHandler(null, rowData)
                 },
                 {
                     icon: 'add',
                     tooltip: 'Add User',
                     isFreeAction: true,
-                    onClick: (event) => addUser()
+                    onClick: () => addUserHandler()
                 }
             ]}
             options={{
                 actionsColumnIndex: -1,
-                sorting: true
+                sorting: true,
+                pageSizeOptions: [5, 10]
             }}
         />
     }
@@ -89,8 +119,22 @@ const UsersTable = (props) => {
                       anchorOrigin={{vertical: 'top', horizontal: 'right'}}
                       onClose={() => dispatch(requestUserFail(''))}
                       message={error}/>
+            <AddEditUserModal initialUser={currentUser}
+                              open={openModal}
+                              isUpdate={isUpdate}
+                              handleClose={(user = null) => handleCloseModal(user)}
+            />
+            <ConfirmModal open={openConfirmModal}
+                          message={`Are you sure you want to delete ${currentUser.firstName} ${currentUser.lastName}?`}
+                          confirmButtonText="Delete"
+                          handleClose={(isAccepted) => handleCloseConfirmModal(isAccepted)}
+            />
         </div>
     );
+};
+
+UsersTable.propTypes = {
+    users: PropTypes.array
 };
 
 export default UsersTable;

@@ -29,10 +29,15 @@ export const getUsers = (token) => {
         dispatch(getUsersStart());
         axios.get('/users.json?auth=' + token)
             .then(res => {
-                dispatch(getUsersSuccess(Object.values(res.data)));
+                const users = Object.keys(res.data).map(el => {
+                    res.data[el].key = el;
+                    return res.data[el];
+                });
+                dispatch(getUsersSuccess(users));
+                // res.data = res.data.filter(el => el !== null);
+                // dispatch(getUsersSuccess(res.data));
             })
             .catch(err => {
-                console.log(err);
                 dispatch(getUsersFail(err));
             });
     };

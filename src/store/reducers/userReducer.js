@@ -3,12 +3,15 @@ import * as userTypes from '../actions/userActions';
 const initialState = {
     user: {},
     loading: false,
-    error: ''
+    error: '',
+    isNeedToUpdate: true
 };
 
 const putUsersStart = (state, action) => {
     return {
-        ...state, loading: true
+        ...state,
+        loading: true,
+        isNeedToUpdate: false
     };
 };
 
@@ -16,7 +19,8 @@ const putUsersSuccess = (state, action) => {
     return {
         ...state,
         user: action.user,
-        loading: false
+        loading: false,
+        isNeedToUpdate: true
     };
 };
 
@@ -24,7 +28,8 @@ const putUsersFail = (state, action) => {
     return {
         ...state,
         loading: false,
-        error: action.error
+        error: action.error,
+        isNeedToUpdate: false
     };
 };
 

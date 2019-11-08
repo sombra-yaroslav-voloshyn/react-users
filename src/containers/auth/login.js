@@ -27,7 +27,6 @@ const Login = (props) => {
     });
 
     useEffect(() => {
-        console.log('LOGIN useEffect', props);
         if (token) {
             props.history.push('/home');
         }

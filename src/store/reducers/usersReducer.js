@@ -22,7 +22,7 @@ const getUsersSuccess = (state, action) => {
 
 const getUsersFail = (state, action) => {
     return {
-        ...state,
+        users: [],
         loading: false,
         error: action.error
     };
